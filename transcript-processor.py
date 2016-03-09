@@ -3,10 +3,24 @@ import operator
 
 transcript = open("raw_transcript.txt", 'r')
 
-speechList = {"SANDERS": [], "CLINTON": []}
-wordDict = {"SANDERS": {}, "CLINTON": {}}
-wordList = {"SANDERS": [], "CLINTON": []}
-relFreqList = {"SANDERS": [], "CLINTON": []}
+candidateList = ["SANDERS", "CLINTON"]
+
+speechList = dict()
+wordDict = dict()
+wordList = dict()
+relFreqList = dict()
+for candidate in candidateList:
+    wordDict[candidate] = dict()
+    speechList[candidate] = []
+    wordList[candidate] = []
+    relFreqList[candidate] = []
+
+
+# speechList = {"SANDERS": [], "CLINTON": []}
+# wordDict = {"SANDERS": {}, "CLINTON": {}}
+# wordList = {"SANDERS": [], "CLINTON": []}
+# relFreqList = {"SANDERS": [], "CLINTON": []}
+
 totalDict = {}
 totalWords = 0
 
