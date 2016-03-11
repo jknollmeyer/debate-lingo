@@ -57,19 +57,26 @@ def sort_by_frequency(wordDict, candidateList):
 
     return wordList, totalDict, totalWords
 
+DEMOCRAT_CANDIDATES = ["SANDERS", "CLINTON", "O'MALLEY"]
+GOP_CANDIDATES = ["BUSH", "CARSON", "CHRISTIE", "CRUZ", "KASICH", "TRUMP"]
+
 party = sys.argv[1]
 
 if party == "dem":
-    directory = "dem_transcripts"
-    candidateList = ["SANDERS", "CLINTON", "O'MALLEY"]
+    directories = ["dem_transcripts"]
+    candidateList = DEMOCRAT_CANDIDATES
 if party == "gop":
-    directory = "gop_transcripts"
-    candidateList = ["BUSH", "CARSON", "CHRISTIE", "CRUZ", "KASICH", "TRUMP"]
+    directories = ["gop_transcripts"]
+    candidateList = GOP_CANDIDATES
+if party == "all":
+    directories = ["gop_transcripts", "dem_transcripts"]
+    candidateList = DEMOCRAT_CANDIDATES + GOP_CANDIDATES
 
 # generator for transcript pieces
-transcripts = (y
-               for x in os.listdir(directory)
-               for y in open(directory + '/' + x).readlines())
+transcripts = (transcript
+               for directory in directories
+               for fileName in os.listdir(directory)
+               for transcript in open(directory + '/' + fileName).readlines())
 # in
 wordDict = dict()
 wordList = dict()
@@ -83,8 +90,9 @@ totalWords = 0
 
 wordDict = transcript_to_candidate(transcripts, candidateList)
 
+# convert dict into sorted list of tuples
 wordList, totalDict, totalWords = sort_by_frequency(wordDict, candidateList)
-# convert the dicts into list of tuples so we can sort them
+
 
 # now that we have the total frequences, we generate the relative frequencies
 for candidate in candidateList:
