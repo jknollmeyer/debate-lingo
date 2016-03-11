@@ -5,7 +5,12 @@ import sys
 
 
 # read in all the lines from the transcript
-def transcript_to_candidate(transcripts, wordDict, candidateList):
+def transcript_to_candidate(transcripts, candidateList):
+    wordDict = dict()
+
+    for candidate in candidateList:
+        wordDict[candidate] = dict()
+
     for line in transcripts:
 
         # check to see if the first word denotes a speaker
@@ -29,7 +34,28 @@ def transcript_to_candidate(transcripts, wordDict, candidateList):
                     wordDict[currentSpeaker][word] += 1
                 else:
                     wordDict[currentSpeaker][word] = 1
+    return wordDict
 
+
+def sort_by_frequency(wordDict, candidateList):
+
+    wordList = dict()
+    totalWords = 0
+    totalDict = {}
+    for candidate in candidateList:
+
+        # convert word dictionary to list of tuples so we can sort it
+        wordList[candidate] = sorted(wordDict[candidate].items(),
+                                     key=operator.itemgetter(1))
+        # tally all the occurences of words
+        for pair in wordList[candidate]:
+            totalWords += pair[1]
+            if pair[0] in totalDict.keys():
+                totalDict[pair[0]] += pair[1]
+            else:
+                totalDict[pair[0]] = pair[1]
+
+    return wordList, totalDict, totalWords
 
 party = sys.argv[1]
 
@@ -49,28 +75,16 @@ wordDict = dict()
 wordList = dict()
 relFreqList = dict()
 for candidate in candidateList:
-    wordDict[candidate] = dict()
     wordList[candidate] = []
     relFreqList[candidate] = []
 
 totalDict = {}
 totalWords = 0
 
-transcript_to_candidate(transcripts, wordDict, candidateList)
+wordDict = transcript_to_candidate(transcripts, candidateList)
 
+wordList, totalDict, totalWords = sort_by_frequency(wordDict, candidateList)
 # convert the dicts into list of tuples so we can sort them
-for candidate in candidateList:
-
-    # convert word dictionary to list of tuples so we can sort it
-    wordList[candidate] = sorted(wordDict[candidate].items(),
-                                 key=operator.itemgetter(1))
-    # tally all the occurences of words
-    for pair in wordList[candidate]:
-        totalWords += pair[1]
-        if pair[0] in totalDict.keys():
-            totalDict[pair[0]] += pair[1]
-        else:
-            totalDict[pair[0]] = pair[1]
 
 # now that we have the total frequences, we generate the relative frequencies
 for candidate in candidateList:
