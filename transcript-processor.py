@@ -3,6 +3,34 @@ import operator
 import os
 import sys
 
+
+# read in all the lines from the transcript
+def transcript_to_candidate(transcripts, wordDict, candidateList):
+    for line in transcripts:
+
+        # check to see if the first word denotes a speaker
+        firstWord = line.split(' ', 1)[0]
+
+        if len(firstWord) > 0 and firstWord[-1] == ':':
+
+            # indicate who is now speaking
+            currentSpeaker = firstWord[:-1]
+            line = line.split(' ', 1)[1]
+
+        # if the speaker is a candidate, tally the words in the sentence
+        if currentSpeaker in candidateList:
+
+            trimmedLine = line.translate(None, ",.!?\n").lower()
+
+            for word in trimmedLine.split(' '):
+                if word.isspace():
+                    pass
+                elif word in wordDict[currentSpeaker].keys():
+                    wordDict[currentSpeaker][word] += 1
+                else:
+                    wordDict[currentSpeaker][word] = 1
+
+
 party = sys.argv[1]
 
 if party == "dem":
@@ -28,30 +56,7 @@ for candidate in candidateList:
 totalDict = {}
 totalWords = 0
 
-# read in all the lines from the transcript
-for line in transcripts:
-
-    # check to see if the first word denotes a speaker
-    firstWord = line.split(' ', 1)[0]
-
-    if len(firstWord) > 0 and firstWord[-1] == ':':
-
-        # indicate who is now speaking
-        currentSpeaker = firstWord[:-1]
-        line = line.split(' ', 1)[1]
-
-    # if the speaker is a candidate, tally the words in the sentence
-    if currentSpeaker in candidateList:
-
-        trimmedLine = line.translate(None, ",.!?\n").lower()
-
-        for word in trimmedLine.split(' '):
-            if word.isspace():
-                pass
-            elif word in wordDict[currentSpeaker].keys():
-                wordDict[currentSpeaker][word] += 1
-            else:
-                wordDict[currentSpeaker][word] = 1
+transcript_to_candidate(transcripts, wordDict, candidateList)
 
 # convert the dicts into list of tuples so we can sort them
 for candidate in candidateList:
