@@ -1,11 +1,21 @@
 # scrapes a raw transcript to get each candidates sentences
 import operator
+import os
+import sys
 
-transcript = open("raw_transcript.txt", 'r')
+party = sys.argv[1]
 
-candidateList = ["SANDERS", "CLINTON"]
+if party == "dem":
+    directory = "dem_transcripts"
+    candidateList = ["SANDERS", "CLINTON", "O'MALLEY"]
+if party == "gop":
+    directory = "gop_transcripts"
+    candidateList = ["BUSH", "CARSON", "CHRISTIE", "CRUZ", "KASICH", "TRUMP"]
 
-
+# generator for transcript pieces
+transcripts = (y
+               for x in os.listdir(directory)
+               for y in open(directory + '/' + x).readlines())
 # in
 wordDict = dict()
 wordList = dict()
@@ -19,12 +29,12 @@ totalDict = {}
 totalWords = 0
 
 # read in all the lines from the transcript
-for line in transcript.readlines():
+for line in transcripts:
 
     # check to see if the first word denotes a speaker
     firstWord = line.split(' ', 1)[0]
 
-    if firstWord[-1] == ':':
+    if len(firstWord) > 0 and firstWord[-1] == ':':
 
         # indicate who is now speaking
         currentSpeaker = firstWord[:-1]
@@ -73,5 +83,5 @@ for candidate in candidateList:
 for candidate in candidateList:
     print candidate
     for pair in wordList[candidate]:
-        if pair[1] > 5 and pair[2] > 0.8:
+        if pair[1] > 10 and pair[2] > 0.8:
             print pair[0] + "  " + str(pair[1]) + " " + str(pair[2])
