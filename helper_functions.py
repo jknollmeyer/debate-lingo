@@ -73,6 +73,6 @@ def transcript_to_candidate_lines(transcripts, candidateList):
         if currentSpeaker in candidateList:
 
             trimmedLine = line.translate(None, "\n")
-            sentenceList[candidate].append(trimmedLine)
+            sentenceList[currentSpeaker].append(trimmedLine)
 
     return sentenceList
