@@ -90,9 +90,26 @@ totalWords = 0
 
 wordDict = transcript_to_candidate(transcripts, candidateList)
 
+# if we're doing party vs. party, make some changes
+if party == "all":
+    wordDict["GOP"] = {}
+    wordDict["DEM"] = {}
+
+    for candidate in candidateList:
+        if candidate in DEMOCRAT_CANDIDATES:
+            currParty = "DEM"
+        else:
+            currParty = "GOP"
+        for word in wordDict[candidate].keys():
+            if word in wordDict[currParty].keys():
+                wordDict[currParty][word] += wordDict[candidate][word]
+            else:
+                wordDict[currParty][word] = wordDict[candidate][word]
+        del(wordDict[candidate])
+    candidateList = ["GOP", "DEM"]
+
 # convert dict into sorted list of tuples
 wordList, totalDict, totalWords = sort_by_frequency(wordDict, candidateList)
-
 
 # now that we have the total frequences, we generate the relative frequencies
 for candidate in candidateList:
