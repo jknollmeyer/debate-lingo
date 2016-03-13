@@ -3,7 +3,7 @@ import operator
 
 
 # read in all the lines from the transcript
-def transcript_to_candidate(transcripts, candidateList):
+def transcript_to_wordcount(transcripts, candidateList):
     wordDict = dict()
 
     for candidate in candidateList:
@@ -54,3 +54,25 @@ def sort_by_frequency(wordDict, candidateList):
                 totalDict[pair[0]] = pair[1]
 
     return wordList, totalDict, totalWords
+
+
+def transcript_to_candidate_lines(transcripts, candidateList):
+
+    sentenceList = dict()
+    for candidate in candidateList:
+        sentenceList[candidate] = []
+
+    for line in transcripts:
+        firstWord = line.split(' ', 1)[0]
+
+        if len(firstWord) > 0 and firstWord[-1] == ':':
+
+            currentSpeaker = firstWord[:-1]
+            line = line.split(' ', 1)[1]
+
+        if currentSpeaker in candidateList:
+
+            trimmedLine = line.translate(None, "\n")
+            sentenceList[candidate].append(trimmedLine)
+
+    return sentenceList
