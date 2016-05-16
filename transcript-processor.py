@@ -2,10 +2,11 @@
 import operator
 import os
 import sys
-from helper_functions import transcript_to_candidate, sort_by_frequency
+from helper_functions import transcript_to_wordcount, sort_by_frequency
 
 DEMOCRAT_CANDIDATES = ["SANDERS", "CLINTON", "O'MALLEY"]
-GOP_CANDIDATES = ["BUSH", "CARSON", "CHRISTIE", "CRUZ", "KASICH", "TRUMP"]
+GOP_CANDIDATES = ["BUSH", "CARSON", "CHRISTIE", "CRUZ", "FIORINA", "KASICH",
+                  "TRUMP", "RUBIO"]
 
 party = sys.argv[1]
 
@@ -35,7 +36,7 @@ for candidate in candidateList:
 totalDict = {}
 totalWords = 0
 
-wordDict = transcript_to_candidate(transcripts, candidateList)
+wordDict = transcript_to_wordcount(transcripts, candidateList)
 
 # if we're doing party vs. party, make some changes
 if party == "all":
@@ -75,4 +76,4 @@ for candidate in candidateList:
     print candidate
     for pair in wordList[candidate]:
         if pair[1] > 10 and pair[2] > 0.8:
-            print pair[0] + "  " + str(pair[1]) + " " + str(pair[2])
+            print pair[0] + "," + str(pair[1]) + "," + str(pair[2])
