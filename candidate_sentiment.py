@@ -12,7 +12,7 @@ def word_feats(words):
 
 
 directories = ["gop_transcripts", "dem_transcripts"]
-DEMOCRAT_CANDIDATES = ["SANDERS", "CLINTON", "O'MALLEY"]
+DEMOCRAT_CANDIDATES = ["CLINTON", "O'MALLEY", "SANDERS"]
 GOP_CANDIDATES = ["BUSH", "CARSON", "CHRISTIE", "CRUZ", "KASICH", "TRUMP"]
 
 candidateList = DEMOCRAT_CANDIDATES + GOP_CANDIDATES
@@ -39,8 +39,9 @@ classifier = NaiveBayesClassifier.train(trainfeats)
 
 sentimentCount = dict((candidate, {'pos': 0, 'neg': 0})
                       for candidate in candidateList)
+print "candidate,party,positive_lines,negative_lines,positive %"
 for candidate in candidateList:
-    print "Generating sentiment for " + candidate
+    # print "Generating sentiment for " + candidate
     for line in lineList[candidate]:
 
         testingWordDict = {}
@@ -49,9 +50,17 @@ for candidate in candidateList:
 
         prediction = classifier.classify(testingWordDict)
         sentimentCount[candidate][prediction] += 1
+    if candidate in GOP_CANDIDATES:
+        party = 'R'
+    else:
+        party = 'D'
+
     percentage = 100 * sentimentCount[candidate]['pos'] / \
         float(sentimentCount[candidate]['pos'] +
               sentimentCount[candidate]['neg'])
-    print "Positive lines: " + str(sentimentCount[candidate]['pos'])
-    print "Negative lines: " + str(sentimentCount[candidate]['neg'])
-    print "Postive %%: %0.2f" % percentage
+
+    print (candidate + ',' +
+           party + ',' +
+           str(sentimentCount[candidate]['pos']) + ',' +
+           str(sentimentCount[candidate]['neg']) + ',' +
+           "%0.1f") % percentage
