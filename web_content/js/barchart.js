@@ -1,5 +1,5 @@
-var margin = {top: 20, right: 20, bottom: 100, left: 40},
-    width = 700 - margin.left - margin.right,
+var margin = {top: 20, right: 20, bottom: 100, left: 70},
+    width = 800 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom;
 
 var headshots = {
@@ -29,9 +29,10 @@ var yAxis = d3.svg.axis()
         .domain([yMin, yMax])
         .range([height, 0]))
     .orient("left")
-    .ticks(10);
+    .ticks(10)
+    .tickFormat(function(d) { return d + "%"; });
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#graph").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
@@ -42,6 +43,7 @@ d3.csv("data/sentiment_results.csv", function(error, data) {
 
     data.forEach(function(d) {
         d.label = d.candidate;
+        d.tag = d.candidate.replace(/'/g,''); // tag is a label which omits O'Malley's apostrophe
         d.value = +d["positive %"];
     });
 
@@ -54,20 +56,20 @@ d3.csv("data/sentiment_results.csv", function(error, data) {
         .call(xAxis)
     .selectAll("text")
         .style("text-anchor", "end")
-        .attr("dx", "-.8em")
-        .attr("dy", "-.55em")
-        .attr("transform", "rotate(-90)");
+        .attr("dx", "0em")
+        .attr("dy", "0.7em")
+        .attr("transform", "rotate(-30)");
     
     svg.append("g")
         .attr("class", "y axis")        
         .call(yAxis)
     .append("text")
         .attr("transform", "rotate(-90)")
-        .attr("y", 0 - margin.left)
+        .attr("y", 5 - margin.left)
         .attr("x", 0 - (height / 2))
         .attr("dy", ".71em")
         .style("text-anchor", "middle")
-        .text("Proportion of postive sentences");
+        .text("Proportion of 'positive' sentences");
 
     // Create the bars
     svg.selectAll("bar")
@@ -77,18 +79,28 @@ d3.csv("data/sentiment_results.csv", function(error, data) {
         .attr("x", function(d) { return x(d.label); })
         .attr("width", x.rangeBand())
         .attr("y", function(d) { return y(d.value); })
-        .attr("height", function(d) { return height - y(d.value); });
+        .attr("height", function(d) { return height - y(d.value); })
+        // Darken the bar from 60% to 40% on mouseover
+        .on("mouseover", function(d) {
+            d3.select(this).style("fill", d.party == 'R' ? "#cc0000" : "#0073e6");
+            d3.select(".barpic." + d.tag).attr("height", 100);
+        })
+        .on("mouseout", function(d) {
+            d3.select(this).style("fill", d.party == 'R' ? '#ff3333' : '#3399ff');
+            d3.select(".barpic." + d.tag).attr("height", 50);
+        });
+
 
     // Data labels
     svg.selectAll(".bartext")
         .data(data)
         .enter()
         .append("text")
-        .attr("class", "bartext")
+        .attr("class", "bartext") 
         .attr("fill", "white")
         .attr("text-anchor", "middle")
         .text(function(d) {
-            return d.value + '%';
+            return d.value.toFixed(1) + '%';
         })
         .attr("x", function(d, i) {
             return x(d.label) + 35;
@@ -103,7 +115,8 @@ d3.csv("data/sentiment_results.csv", function(error, data) {
         .enter()
         .append("svg:image")
         .attr("xlink:href", function(d) {return headshots[d.label];})
-        .attr("height", 60)
+        .attr("class", function(d) { return "barpic " + d.tag; })
+        .attr("height", 50)
         .attr("width", x.rangeBand())
         .attr("y", 0)
         .attr("x", function(d, i) { return x(d.label); });
